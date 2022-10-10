@@ -1,0 +1,53 @@
+{
+  "name": "@lla-ui/utils",
+  "version": "0.0.1",
+  "description": "mono example",
+  "author": "“ncqwer” <“18694039767@163.com”>",
+  "license": "MIT",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncqwer/mono-exmaple-ui.git"
+  },
+  "scripts": {
+    "build:type": "tsc --emitDeclarationOnly",
+    "build:ts": "vite build",
+    "build": "yarn build:ts && yarn build:type",
+    "prepublish": "rm dist/tsconfig.tsbuildinfo"
+  },
+  "bugs": {
+    "url": "https://github.com/ncqwer/mono-exmaple-ui/issues"
+  },
+  "homepage": "https://github.com/ncqwer/mono-exmaple-ui#readme",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "peerDependencies": {
+    "@types/react": "^16.8 || ^17.0 || ^18.0",
+    "@types/react-dom": "^16.8 || ^17.0 || ^18.0",
+    "react": "^16.8 || ^17.0 || ^18.0",
+    "react-dom": "^16.8 || ^17.0 || ^18.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "gitHead": "1cdeec5380c769275350c8614b579c5883bb6c54"
+}

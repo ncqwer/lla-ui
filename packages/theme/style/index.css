@@ -1,0 +1,131 @@
+@layer components{
+	.rvt-color-editor{
+		@apply  w-screen p-16 max-w-[1000px]; 
+
+
+		&__line{
+			&__raw{
+				@apply relative w-36;
+
+				.category{
+					@apply font-bold text-neutral-variant-on-surface;
+				}
+
+				.rvt-color-input__trigger{
+					@apply absolute top-1/2 left-0 transform -translate-y-1/2;
+				}
+			}
+			&+&{
+				@apply mt-4;
+			}
+
+			.arrow{
+				@apply absolute left-0 bottom-4 flex items-center;
+
+				&__body{
+					@apply h-0.5 w-16 bg-black;
+				}
+				&__head{
+					@apply w-0 h-0 border-4 border-solid;
+
+					border-color: transparent transparent transparent rgb(var(--color-neutral-variant-on-surface));
+				}
+			}
+
+			.blocks{
+				@apply grid grid-cols-4 h-28 flex-1;
+			}
+
+			.block{
+				@apply p-4 flex flex-col justify-between;
+				
+				.hex{
+					@apply text-end;
+				}
+
+			}
+			&--primary{
+				.key{
+					@apply bg-primary-key text-primary-on-key;
+				}
+				.on-key{
+					@apply bg-primary-on-key text-primary-key;
+				}
+				.container{
+					@apply bg-primary-container text-primary-on-container;
+				}
+				.on-container{
+					@apply bg-primary-on-container text-primary-container;
+				}
+			}
+			&--secondary{
+				.key{
+					@apply bg-secondary-key text-secondary-on-key;
+				}
+				.on-key{
+					@apply bg-secondary-on-key text-secondary-key;
+				}
+				.container{
+					@apply bg-secondary-container text-secondary-on-container;
+				}
+				.on-container{
+					@apply bg-secondary-on-container text-secondary-container;
+				}
+			}
+			&--tertiary{
+				.key{
+					@apply bg-tertiary-key text-tertiary-on-key;
+				}
+				.on-key{
+					@apply bg-tertiary-on-key text-tertiary-key;
+				}
+				.container{
+					@apply bg-tertiary-container text-tertiary-on-container;
+				}
+				.on-container{
+					@apply bg-tertiary-on-container text-tertiary-container;
+				}
+			}
+			&--neutral{
+				.background{
+					@apply bg-neutral-background text-neutral-on-background;
+				}
+				.on-background{
+					@apply bg-neutral-on-background text-neutral-background;
+				}
+				.surface{
+					@apply bg-neutral-surface text-neutral-on-surface;
+				}
+				.on-surface{
+					@apply bg-neutral-on-surface text-neutral-surface;
+				}
+			}
+			&--neutral-variant{
+				.surface{
+					@apply bg-neutral-variant-surface text-neutral-variant-on-surface;
+				}
+				.on-surface{
+					@apply bg-neutral-variant-on-surface text-neutral-variant-surface;
+				}
+				.outlines{
+					@apply bg-neutral-variant-outline text-neutral-variant-surface col-span-2;
+				}
+			}
+		}		
+	}
+
+	.rvt-color-input{
+		@apply shadow-md rounded-md p-4 bg-neutral-surface/95;
+
+		.sketch-picker {
+			box-shadow:none !important;
+			padding: 0 !important;
+			background: inherit !important;
+		}
+	}
+
+	.rvt-color-input__trigger{
+		@apply w-10 h-10 rounded-full cursor-pointer;
+	}
+
+}

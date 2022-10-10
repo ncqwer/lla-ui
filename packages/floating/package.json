@@ -1,0 +1,64 @@
+{
+  "name": "@lla-ui/floating",
+  "version": "0.0.1",
+  "description": "react ui helper with tailwind",
+  "author": "“ncqwer” <“18694039767@163.com”>",
+  "license": "MIT",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist",
+    "style"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncqwer/mono-exmaple-ui.git"
+  },
+  "scripts": {
+    "build:css": "yarn postcss notailwind.css -o dist/style/notailwind.css",
+    "build:type": "tsc --emitDeclarationOnly",
+    "build:ts": "vite build",
+    "build": "yarn build:ts && yarn build:type && yarn build:css",
+    "prepublish": "rm dist/tsconfig.tsbuildinfo"
+  },
+  "bugs": {
+    "url": "https://github.com/ncqwer/mono-exmaple-ui/issues"
+  },
+  "homepage": "https://github.com/ncqwer/mono-exmaple-ui#readme",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "peerDependencies": {
+    "@types/react": "^16.8 || ^17.0 || ^18.0",
+    "@types/react-dom": "^16.8 || ^17.0 || ^18.0",
+    "react": "^16.8 || ^17.0 || ^18.0",
+    "react-dom": "^16.8 || ^17.0 || ^18.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@floating-ui/react-dom-interactions": "^0.9.3",
+    "@lla-ui/utils": "^0.0.1",
+    "classnames": "^2.3.2",
+    "react-transition-group": "^4.4.5"
+  },
+  "devDependencies": {
+    "@types/react-transition-group": "^4.4.5"
+  },
+  "gitHead": "1cdeec5380c769275350c8614b579c5883bb6c54"
+}

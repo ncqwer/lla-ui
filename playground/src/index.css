@@ -1,0 +1,25 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+@import "./packages.css";
+
+
+:root{
+  --color-primary: 118, 74, 188;
+}
+
+.ͼ1.cm-editor.cm-focused{
+  outline: none !important;
+}
+
+.ͼ2 .cm-gutters{
+  background-color: none;
+  color: none;
+  border:none;
+}
+
+.cm-editor{
+  @apply h-full;
+}

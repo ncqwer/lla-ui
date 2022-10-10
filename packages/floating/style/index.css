@@ -1,0 +1,63 @@
+
+@layer components{
+	.rvt-popover__arrow{
+		background-color: inherit;
+		position: absolute;
+		width: 8px;
+		height: 8px;
+		transform: rotate(45deg);
+	}
+
+	.rvt-modal{
+		@apply fixed inset-0 flex justify-center items-center;
+
+		&__mask{
+			@apply absolute bg-opacity-60 inset-0 bg-neutral-on-surface backdrop-blur-sm z-10;
+		}
+
+		&__content{
+			@apply z-20;
+		}
+
+		&-enter{
+			.rvt-modal__content{
+				@apply transform -translate-y-10 opacity-0 scale-90;
+			}
+			.rvt-modal__mask{
+				@apply opacity-0;
+			}
+		}
+		&-enter-active{
+			.rvt-modal__content{
+				@apply transform translate-y-0 opacity-100 scale-100;
+				/* will-change: transform,opaction; */
+				transition: transform 300ms, opacity 300ms;
+			}
+			.rvt-modal__mask{
+				@apply opacity-100 duration-300 transition-opacity;
+			}
+		}
+		&-exit{
+			.rvt-modal__content{
+				@apply transform translate-y-0 opacity-100 scale-100;
+			}
+			.rvt-modal__mask{
+				@apply opacity-100;
+			}
+		}
+		&-exit-active{
+			.rvt-modal__content{
+				@apply transform -translate-y-10 opacity-0 scale-90;
+				/* will-change: transform,opaction; */
+				transition: transform 300ms, opacity 300ms;
+			}
+			.rvt-modal__mask{
+				@apply opacity-0 duration-300 transition-opacity;
+			}
+		}
+	}
+	.rvt-modal-exit-done{
+		@apply hidden;
+	}	
+}
+
