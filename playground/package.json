@@ -1,7 +1,7 @@
 {
   "name": "playground",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,10 +10,10 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.1.0",
     "@codemirror/state": "^6.1.2",
-    "@lla-ui/floating": "^0.0.2",
-    "@lla-ui/signal": "^0.0.2",
-    "@lla-ui/theme": "^0.0.2",
-    "@lla-ui/utils": "^0.0.2",
+    "@lla-ui/floating": "^0.0.3",
+    "@lla-ui/signal": "^0.0.3",
+    "@lla-ui/theme": "^0.0.3",
+    "@lla-ui/utils": "^0.0.3",
     "@replit/codemirror-vim": "^6.0.2",
     "codemirror": "^6.0.1",
     "json-beautify": "^1.1.1",
