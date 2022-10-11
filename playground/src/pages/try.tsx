@@ -1,5 +1,5 @@
 import React from 'react';
-import { signal, useSignalState } from '@lla-ui/signal';
+import { ID, Signal, signal, useSignalState } from '@lla-ui/signal';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { transform } from 'sucrase';
 import { useSize } from '@lla-ui/utils';
@@ -22,6 +22,35 @@ const useStrSignalState = (key: string, code: string) => {
   return useSignalState(s);
 };
 
+const atom = function <T>(key: ID, _initialValue: T) {
+  let prev = _initialValue;
+  return signal(key, (_, v: React.SetStateAction<T>) => {
+    if (typeof v === 'function') {
+      prev = (v as any)(prev);
+    } else {
+      prev = v;
+    }
+    return prev;
+  });
+};
+
+const useAtom = function <T>(
+  signal: Signal<Array<T | ((v: any) => T)>, T>,
+  initialState: T | (() => T),
+) {
+  const [value, recall] = useSignalState(signal, {
+    args: [initialState],
+  });
+  if (value.error) throw value.error;
+  return [
+    value.value as T,
+    React.useCallback(
+      (v: React.SetStateAction<T>) => recall({ args: [v] }),
+      [recall],
+    ),
+  ] as const;
+};
+
 export default () => {
   const [instant, recallInstant] = useStrSignalState(
     'instant',
@@ -32,13 +61,17 @@ export default () => {
   `,
   );
   const [size, ref] = useSize();
+  const [text, setText] = useAtom<string>(
+    React.useMemo(() => atom('atom', 'hello'), []),
+    'world',
+  );
 
   const [parent] = useStrSignalState(
     'parent',
     `
   async (get) => {
     await new Promise(res=>setTimeout(res,1000));
-    return get('instant');
+    return get('atom');
   }
   `,
   );
@@ -52,9 +85,24 @@ export default () => {
   } 
   `,
   );
+
   const style = child.status === 'fulfilled' ? { height: '60px' } : {};
   return (
     <div ref={ref} style={style}>
+      <input
+        type="text"
+        value={text}
+        onChange={(e) =>
+          setText((prev) => {
+            console.log(
+              '%c [ prev ]-96',
+              'font-size:13px; background:pink; color:#bf2c9f;',
+              prev,
+            );
+            return e.target.value;
+          })
+        }
+      />
       <div>
         <div>parent</div>
         {parent.status === 'pending' && <div>loading...</div>}

@@ -37,7 +37,7 @@ const getCategory = signal('getCategory',async ()=>{
 });
 
 const getGoods = signal('getGoods',async (get)=>{
-	const category = get(getCategory);
+	const category = await get(getCategory);
 	const { data: category } = await fetch('getCategory',{
 		method: 'post',
 		headers: {
@@ -55,6 +55,15 @@ const [categoryState, refetch] =  useSignalState(getCategory);
 const { state, data, error } = () => useSignal(getGoods)
 
 // refetch category will force goods fetcher rerun
+
+
+// to keep same interface with React.useState ,also privide 
+
+const textAtom = atom('atom_text','hello'); // is special signal whose exec is sync and no dependency
+
+const [text, setText] = useAtom<string>(
+	textAtom,'world',
+); // which is equal `const [text,setText] = React.useState('world);
 ```
 
 ## Api

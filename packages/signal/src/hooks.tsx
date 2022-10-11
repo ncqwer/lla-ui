@@ -2,9 +2,9 @@ import React from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { createStore } from './createStore';
 import { createSSRSupport } from './ssr';
-// eslint-disable-next-line no-unused-vars
-import type { Signal, Func, ID, Context, SSRCache } from './type';
+import type { ID, Signal, SSRCache } from './type';
 import { getUpdateWrapper } from './supportAct';
+import { signal } from './signal';
 
 export type StoreType = ReturnType<typeof createStore>;
 export type SSRSupport = ReturnType<typeof createSSRSupport>;
@@ -83,6 +83,36 @@ export function useSignalState<S extends Signal>(
     React.useCallback(
       (option: S['option'] = {}) => store.recall(signal, option),
       [signal],
+    ),
+  ] as const;
+}
+
+// special case for useState interface with sync state
+export function atom<T>(key: ID, _initialValue: T) {
+  let prev = _initialValue;
+  return signal(key, (_, v: React.SetStateAction<T>) => {
+    if (typeof v === 'function') {
+      prev = (v as any)(prev);
+    } else {
+      prev = v;
+    }
+    return prev;
+  });
+}
+
+export function useAtom<T>(
+  signal: Signal<Array<T | ((v: any) => T)>, T>,
+  initialState: T | (() => T),
+) {
+  const [value, recall] = useSignalState(signal, {
+    args: [initialState],
+  });
+  if (value.error) throw value.error;
+  return [
+    value.value as T,
+    React.useCallback(
+      (v: React.SetStateAction<T>) => recall({ args: [v] }),
+      [recall],
     ),
   ] as const;
 }
