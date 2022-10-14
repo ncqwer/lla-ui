@@ -6,4 +6,7 @@
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
   },
+  "references": [
+    {"path": "../utils"}
+  ]
 }

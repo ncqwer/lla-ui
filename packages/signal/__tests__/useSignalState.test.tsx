@@ -161,7 +161,7 @@ describe('[useSingalState] test', () => {
     );
     const child = signal(
       'child',
-      async (get, str: string) => {
+      async ({ get }, str: string) => {
         const p = await get(parent);
         await delay(100);
         return `${p}-${str}`;

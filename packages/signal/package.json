@@ -37,6 +37,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
+    "@lla-ui/utils": "^0.0.3",
     "use-sync-external-store": "^1.2.0"
   },
   "devDependencies": {

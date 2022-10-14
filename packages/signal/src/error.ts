@@ -22,3 +22,15 @@ export class DependencyError extends Error {
     super(message);
   }
 }
+
+export class SetError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+}
+
+export class DataSourceSSRError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+}

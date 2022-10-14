@@ -1,5 +1,12 @@
 import React from 'react';
-import { ID, Signal, signal, useSignalState } from '@lla-ui/signal';
+import {
+  ID,
+  Signal,
+  signal,
+  useSignalState,
+  dataSource,
+  useSignal,
+} from '@lla-ui/signal';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { transform } from 'sucrase';
 import { useSize } from '@lla-ui/utils';
@@ -51,6 +58,56 @@ const useAtom = function <T>(
   ] as const;
 };
 
+const source = dataSource<string>()('datasource', async ({ get, set }) => {
+  await new Promise((res) => setTimeout(res, 1000));
+  const v = get('instant');
+  console.log(
+    '%c [ v ]-63',
+    'font-size:13px; background:pink; color:#bf2c9f;',
+    v,
+  );
+  let handler: any = null;
+  let flag = false;
+  const id = setInterval(() => {
+    console.log('ajskdfjsl');
+    set(`${v}-${Date.now()}`);
+    if (!flag) {
+      flag = true;
+      handler(() => {
+        console.log('clear', v);
+        clearInterval(id);
+      });
+    }
+  }, 5000);
+  return new Promise((res) => {
+    handler = res;
+  });
+  return () => {};
+});
+
+const delay = atom('delay', 1000);
+
+const dateTimeBySeconds = dataSource<number>()(
+  'dataTimeBySecond',
+  ({ get, set }) => {
+    const d = get(delay);
+    let handler: any = null;
+    let flag = false;
+    const id = setInterval(() => {
+      set(Date.now());
+      if (!flag) {
+        flag = true;
+        handler(() => {
+          clearInterval(id);
+        });
+      }
+    }, d);
+    return new Promise((res) => {
+      handler = res;
+    });
+  },
+);
+
 export default () => {
   const [instant, recallInstant] = useStrSignalState(
     'instant',
@@ -60,6 +117,13 @@ export default () => {
   }
   `,
   );
+  const state = useSignal(dateTimeBySeconds);
+  console.log(
+    '%c [ state ]-124',
+    'font-size:13px; background:pink; color:#bf2c9f;',
+    state,
+  );
+  useSignal(source);
   const [size, ref] = useSize();
   const [text, setText] = useAtom<string>(
     React.useMemo(() => atom('atom', 'hello'), []),
@@ -69,16 +133,16 @@ export default () => {
   const [parent] = useStrSignalState(
     'parent',
     `
-  async (get) => {
-    await new Promise(res=>setTimeout(res,1000));
-    return get('atom');
+  async ({ get }) => {
+    await new Promise(res=>setTimeout(res,100));
+    return get('datasource');
   }
   `,
   );
   const [child] = useStrSignalState(
     'child',
     `
-  async (get) => {
+  async ({ get }) => {
     const data = await get('parent');
     await new Promise(res=>setTimeout(res,1000)) ;
     return \`the same $\{data\}\`;
@@ -107,19 +171,19 @@ export default () => {
         <div>parent</div>
         {parent.status === 'pending' && <div>loading...</div>}
         {parent.status === 'rejected' && <div>{`${parent.error}`}</div>}
-        {parent.status === 'fulfilled' && <div>{parent.value}</div>}
+        {parent.status === 'fulfilled' && <div>{parent.value as any}</div>}
       </div>
       <div>
         <div>child</div>
         {child.status === 'pending' && <div>loading...</div>}
         {child.status === 'rejected' && <div>{`${child.error}`}</div>}
-        {child.status === 'fulfilled' && <div>{child.value}</div>}
+        {child.status === 'fulfilled' && <div>{child.value as any}</div>}
       </div>
       <div>{size?.height || 'noono'}</div>
       <input
         className="px-4 py-2 bg-primary-container outline-neutral-variant-outline outline-1"
         type="text"
-        value={instant.value}
+        value={instant.value as any}
         onChange={(e) => {
           recallInstant({
             args: [e.target.value],

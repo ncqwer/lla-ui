@@ -3,11 +3,13 @@ import {
   CircularError,
   SSRError,
   DependencyError,
+  DataSourceSSRError,
 } from './error';
 import { isPromisify, delay } from './utils';
 
-import type { ID, Context, Option, Signal } from './type';
+import type { ID, Context, Option, Signal, DataSource } from './type';
 import { PLACEHOLDER } from './type';
+import { isBrowser } from '@lla-ui/utils';
 
 // const ERRORVALUE = Symbol('ERRORVALUE');
 
@@ -18,6 +20,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
   // eslint-disable-next-line no-unused-vars
   const executionMap = new Map<ID, (...args: any[]) => any>();
   const optionMap = new Map<ID, Option<any> | undefined>();
+  const typeMap = new Map<ID, 'single' | 'mutiply'>();
 
   Object.entries(initialValues).forEach(([id, ctx]) => {
     ctxMap.set(id, fillCtx(ctx));
@@ -75,29 +78,31 @@ export const createStore = (initialValues: Record<ID, Context>) => {
   }
 
   function registerSignal(
-    { id, execution, option: raw }: Signal,
+    { id, execution, option: raw, type }: Signal | DataSource,
     _option?: Signal['option'],
   ) {
     const oldExecution = executionMap.get(id);
     // const oldOptions = optionsMap.get(id);
     if (execution !== oldExecution) {
+      typeMap.set(id, type);
       executionMap.set(id, execution);
-      optionMap.set(id, _option || raw);
+      optionMap.set(id, { ..._option, ...raw });
       if (!oldExecution) return;
       exec(id);
     }
   }
 
   function recall<Param extends any[], Ret>(
-    signal: Signal<Param, Ret>,
+    signal: Signal<Param, Ret> | DataSource<any, Param, Ret>,
     newOption: Signal<Param, Ret>['option'],
   ) {
     optionMap.set(signal.id, { ...signal?.option, ...newOption });
     exec(signal.id);
   }
 
-  function getCtx(signal: Signal<any>) {
+  function getCtx(signal: Signal<any> | DataSource) {
     const { id } = signal;
+
     let ctx = ctxMap.get(id);
     if (!ctx) {
       registerSignal(signal);
@@ -110,8 +115,13 @@ export const createStore = (initialValues: Record<ID, Context>) => {
     const oldContext = ctxMap.get(id);
     const execution = executionMap.get(id)!;
     const { timeout, args = [] } = optionMap.get(id) || {};
+    const type = typeMap.get(id)!;
+    if (!isBrowser && type === 'mutiply') {
+      throw new DataSourceSSRError(`DataSource[id:${id}] not support ssr!`);
+    }
     if (oldContext) {
       oldContext.isOld = true;
+      if (oldContext.cleanup) oldContext.cleanup();
     }
     const ctx: Context = {
       dependencies: [],
@@ -124,6 +134,8 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       },
       isOld: false,
       version: globalVersion++,
+      cleanup: null,
+      type,
     };
     const getter = (other: Signal<any> | Signal<any>['id']) => {
       if (ctx.isOld) {
@@ -131,28 +143,67 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       }
       if (typeof other !== 'string') {
         const target = getCtx(other);
+        // if (ctx.version < target.version) {
+        //   ctx.isOld = true;
+        //   ctx.dependencies.push(other.id);
+        //   ctx.dependencyMap[other.id] = true;
+        //   throw new OldVersionError();
+        // }
         if (hasCircularDependency(id, other.id)) throw new CircularError();
         if (target.raw === PLACEHOLDER) throw new DependencyError();
         ctx.dependencies.push(other.id);
         ctx.dependencyMap[other.id] = true;
-        return target.raw;
+        return target.type === 'single'
+          ? target.raw
+          : target.data.status === 'fulfilled'
+          ? Promise.resolve(target.data.value)
+          : target.raw;
       } else {
         const target = ctxMap.get(other);
         if (!target) throw new Error();
+        // if (ctx.version < target.version) {
+        //   ctx.isOld = true;
+        //   ctx.dependencies.push(other);
+        //   ctx.dependencyMap[other] = true;
+        //   throw new OldVersionError();
+        // }
         if (hasCircularDependency(id, other)) throw new CircularError();
         if (target.raw === PLACEHOLDER) throw new DependencyError();
         ctx.dependencies.push(other);
         ctx.dependencyMap[other] = true;
-        return target.raw;
+        return target.type === 'single'
+          ? target.raw
+          : target.data.status === 'fulfilled'
+          ? Promise.resolve(target.data.value)
+          : target.raw;
+      }
+    };
+    let allowSetterTriggerUpdate = false;
+    let hasSetBeforeReturnCleanup = false;
+    const setter = (v: Signal['typeMarker']) => {
+      if (ctx.isOld) return;
+      if (v !== ctx.data.value) {
+        ctx.data = {
+          ...ctx.data,
+          value: v,
+        };
+        if (allowSetterTriggerUpdate) {
+          ctx.version = globalVersion++;
+          scheduleUpdatePlan(id);
+          notify(id);
+        } else {
+          hasSetBeforeReturnCleanup = true;
+        }
       }
     };
     ctxMap.set(id, ctx);
-    let result = PLACEHOLDER;
+    let result: any = PLACEHOLDER;
     let err = null;
 
     try {
-      result = execution(getter, ...args);
+      result = execution({ get: getter, set: setter }, ...args);
     } catch (e) {
+      if (e instanceof DataSourceSSRError) throw e;
       err = e;
       result = PLACEHOLDER;
     }
@@ -163,22 +214,36 @@ export const createStore = (initialValues: Record<ID, Context>) => {
         .then(async (v) => {
           isTimeoutFirst = isTimeoutFirst === null ? false : isTimeoutFirst;
           if (ctx.isOld) return;
-          if (v !== ctx.data.value) {
+          if (type === 'single') {
+            if (v !== ctx.data.value) {
+              ctx.data = {
+                error: null,
+                status: 'fulfilled',
+                value: v,
+              };
+              scheduleUpdatePlan(id);
+              notify(id);
+            } else {
+              if (isTimeoutFirst) {
+                notify(id);
+              }
+            }
+          } else if (type === 'mutiply') {
+            allowSetterTriggerUpdate = true;
             ctx.data = {
+              ...ctx.data,
               error: null,
               status: 'fulfilled',
-              value: v,
             };
-            scheduleUpdatePlan(id);
-            notify(id);
-          } else {
-            if (isTimeoutFirst) {
+            if (hasSetBeforeReturnCleanup) {
+              scheduleUpdatePlan(id);
               notify(id);
             }
           }
         })
         .catch((e) => {
           if (e instanceof OldVersionError) return;
+          if (e instanceof DataSourceSSRError) throw e;
           ctx.data = {
             error: e,
             status: 'rejected',
@@ -198,19 +263,39 @@ export const createStore = (initialValues: Record<ID, Context>) => {
             notify(id);
           }
         });
+      ctx.cleanup = () =>
+        (result as any).then(
+          (f: any) => typeof f === 'function' && f(),
+          () => {},
+        );
+      ctx.raw =
+        type === 'mutiply'
+          ? result.then(() => {
+              return ctx.data.value;
+            })
+          : result;
     } else {
-      const old = ctx.data.value;
-      ctx.data = {
-        error: err as any,
-        status: err ? 'rejected' : 'fulfilled',
-        value: result,
-      };
-      if (old !== PLACEHOLDER && result !== old) {
-        scheduleUpdatePlan(id);
-        notify(id);
+      ctx.raw = result;
+      if (type === 'single') {
+        const old = ctx.data.value;
+        ctx.data = {
+          error: err as any,
+          status: err ? 'rejected' : 'fulfilled',
+          value: result,
+        };
+        if (old !== PLACEHOLDER && result !== old) {
+          scheduleUpdatePlan(id);
+          notify(id);
+        }
+      } else if (type === 'mutiply') {
+        ctx.cleanup = () => typeof result === 'function' && (result as any)();
+        allowSetterTriggerUpdate = true;
+        if (hasSetBeforeReturnCleanup) {
+          scheduleUpdatePlan(id);
+          notify(id);
+        }
       }
     }
-    ctx.raw = result;
     return ctx;
   }
 
@@ -323,6 +408,8 @@ export const createStore = (initialValues: Record<ID, Context>) => {
     if (needGC)
       allIds.forEach((removeId) => {
         if (!graphIds[removeId]) {
+          const t = ctxMap.get(removeId)!;
+          if (t.cleanup) t.cleanup();
           ctxMap.delete(removeId);
           subscriberMap.delete(removeId);
           executionMap.delete(removeId);

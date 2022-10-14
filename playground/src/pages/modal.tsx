@@ -3,11 +3,7 @@ import { Modal } from '@lla-ui/floating';
 
 export default () => {
   const [isOpen, setIsOpen] = React.useState(false);
-  console.log(
-    '%c [ __DEV__ ]-7',
-    'font-size:13px; background:pink; color:#bf2c9f;',
-    __DEV__,
-  );
+
   return (
     <div className="bg-neutral-surface w-screen h-screen">
       <button className="px-4 py-2" onClick={() => setIsOpen(true)}>

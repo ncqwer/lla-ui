@@ -2,9 +2,10 @@ import React from 'react';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { createStore } from './createStore';
 import { createSSRSupport } from './ssr';
-import type { ID, Signal, SSRCache } from './type';
+import type { Context, DataSource, ID, Signal, SSRCache } from './type';
 import { getUpdateWrapper } from './supportAct';
 import { signal } from './signal';
+import { useEffectOnce } from '@lla-ui/utils';
 
 export type StoreType = ReturnType<typeof createStore>;
 export type SSRSupport = ReturnType<typeof createSSRSupport>;
@@ -25,9 +26,12 @@ export const SharedScope: React.FC<{
     return [s, unRegister] as const;
   });
 
-  React.useEffect(() => {
-    return un;
-  }, [un]);
+  useEffectOnce(() => {
+    return () => {
+      store.topologicalSorting([], true);
+      un();
+    };
+  });
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
@@ -51,12 +55,15 @@ export const SSRSupportWrapper: React.FC<{
 
 export const useSignalStore = () => React.useContext(StoreContext)!;
 
-export function useSignal<S extends Signal>(signal: S, options?: S['option']) {
+export function useSignal<S extends Signal | DataSource>(
+  signal: S,
+  options?: S['option'],
+) {
   const store = React.useContext(StoreContext)!;
   React.useMemo(() => store.registerSignal(signal, options), [signal]);
   const snapshot = React.useCallback(() => {
     const data = store.getSnapshotData(signal.id);
-    return data; //
+    return data as Context<S['typeMarker']>['data']; //
   }, [signal]);
   return useSyncExternalStore(
     React.useCallback(
@@ -73,7 +80,7 @@ export function useSignal<S extends Signal>(signal: S, options?: S['option']) {
   );
 }
 
-export function useSignalState<S extends Signal>(
+export function useSignalState<S extends Signal | DataSource>(
   signal: S,
   options?: S['option'],
 ) {
@@ -96,7 +103,7 @@ export function atom<T>(key: ID, _initialValue: T) {
     } else {
       prev = v;
     }
-    return prev;
+    return prev as T;
   });
 }
 
