@@ -1,6 +1,6 @@
 {
   "name": "@lla-ui/floating",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "react ui helper with tailwind",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@floating-ui/react-dom-interactions": "^0.9.3",
-    "@lla-ui/utils": "^0.0.3",
+    "@lla-ui/utils": "^0.0.4",
     "classnames": "^2.3.2",
     "react-transition-group": "^4.4.5"
   },
