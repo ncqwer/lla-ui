@@ -128,7 +128,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       dependencyMap: {},
       raw: null,
       data: {
-        value: oldContext?.data?.value || PLACEHOLDER,
+        value: oldContext?.data?.value ?? PLACEHOLDER,
         error: oldContext?.data?.error || null,
         status: oldContext?.data?.status || 'pending', // 'rejected' || 'fulfilled' | 'pending'
       },
@@ -289,6 +289,11 @@ export const createStore = (initialValues: Record<ID, Context>) => {
         }
       } else if (type === 'mutiply') {
         ctx.cleanup = () => typeof result === 'function' && (result as any)();
+        ctx.data = {
+          ...ctx.data,
+          error: null,
+          status: 'fulfilled',
+        };
         allowSetterTriggerUpdate = true;
         if (hasSetBeforeReturnCleanup) {
           scheduleUpdatePlan(id);
