@@ -6,4 +6,9 @@ module.exports = {
     ? []
     : ['../packages/*/src/**/*.{html,js,ts,tsx,jsx}']
   ).concat([...baseConfig.content]),
+  plugins: [
+    require('@tailwindcss/forms')({
+      strategy: 'class', // only generate classes
+    }),
+  ],
 };

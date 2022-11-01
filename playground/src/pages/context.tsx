@@ -495,11 +495,11 @@ export default () => {
     }));
   }
 
-  function removeBlock(uuid: string, others: any) {
-    setBlockMap((prev) => {
-      const newMap = { ...prev };
-      delete newMap[uuid];
-      return newMap;
-    });
-  }
+  // function _removeBlock(uuid: string, others: any) {
+  //   setBlockMap((prev) => {
+  //     const newMap = { ...prev };
+  //     delete newMap[uuid];
+  //     return newMap;
+  //   });
+  // }
 };

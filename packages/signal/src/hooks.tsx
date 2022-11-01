@@ -17,18 +17,28 @@ const SSRSupportContext = React.createContext<SSRSupport | null>(null);
 export const SharedScope: React.FC<{
   scopeName: string;
   children: React.ReactNode;
-}> = ({ scopeName, children }) => {
+  isForzen?: boolean;
+  forzenCache?: any;
+}> = ({ scopeName, children, isForzen = false, forzenCache }) => {
   const ssrSupport = React.useContext(SSRSupportContext)!;
+  const prevCache = React.useRef(forzenCache);
   const [[store, un]] = React.useState(() => {
     const init = ssrSupport.getInit(scopeName) || {};
-    const s = createStore(init);
+    const s = createStore(isForzen ? forzenCache ?? init : init, isForzen);
     const unRegister = ssrSupport.register(scopeName, s);
     return [s, unRegister] as const;
   });
 
+  React.useEffect(() => {
+    if (isForzen && forzenCache !== prevCache) {
+      prevCache.current = forzenCache;
+      store.setSnapshot(forzenCache);
+    }
+  }, [isForzen, store, forzenCache]);
+
   useEffectOnce(() => {
     return () => {
-      store.topologicalSorting([], true);
+      store.unmount();
       un();
     };
   });

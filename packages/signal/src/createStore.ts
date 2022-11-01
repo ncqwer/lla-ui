@@ -13,8 +13,15 @@ import { isBrowser } from '@lla-ui/utils';
 
 // const ERRORVALUE = Symbol('ERRORVALUE');
 
-export const createStore = (initialValues: Record<ID, Context>) => {
-  let globalVersion = 0;
+export const createStore = (
+  initialValues: Record<ID, Context>,
+  isFrozen = false,
+) => {
+  let mountFlag = true;
+  let globalVersion = Array.from(Object.values(initialValues)).reduce(
+    (acc, ctx) => Math.max(acc, ctx.version),
+    0,
+  );
   const ctxMap = new Map<ID, Context>();
   const subscriberMap = new Map<ID, Array<() => void>>();
   // eslint-disable-next-line no-unused-vars
@@ -29,22 +36,37 @@ export const createStore = (initialValues: Record<ID, Context>) => {
   return {
     subscribe,
     getSnapshotData,
+    getSnapshot,
+    setSnapshot,
     registerSignal,
     recall,
     __internalData: ctxMap,
     topologicalSorting,
+    unmount: () => {
+      topologicalSorting([], true);
+      mountFlag = false;
+    },
   };
 
   function fillCtx(ctx: Context): Context {
     const status = ctx.data.status;
     const newError =
       status === 'rejected' ? new SSRError(ctx.data.error as any) : null;
-    const raw =
+    let raw =
       ctx.raw === 'isSimple'
         ? ctx.data.value
         : status === 'fulfilled'
         ? Promise.resolve(ctx.data.value)
-        : Promise.reject(newError);
+        : status === 'rejected'
+        ? Promise.reject(newError)
+        : null;
+    if (status === 'pending') {
+      if (!isFrozen)
+        throw new Error(
+          'Some signal value is pending after ssr. This is Bug,please issue it!',
+        );
+      raw = new Promise(() => {}); // this promise never resolve or reject, it is safe in forzen mode
+    }
     return {
       ...ctx,
       raw,
@@ -92,6 +114,41 @@ export const createStore = (initialValues: Record<ID, Context>) => {
     }
   }
 
+  function getSnapshot() {
+    return Array.from(ctxMap.entries()).reduce(
+      (a, [id, ctx]) => ({
+        ...a,
+        [id]: {
+          ...ctx,
+          raw: isPromisify(ctx.raw) ? 'isPromise' : 'isSimple',
+          data: {
+            ...ctx.data,
+            error:
+              ctx.data.status === 'rejected' ? ctx.data.error!.message : null,
+          },
+        },
+      }),
+      {},
+    );
+  }
+
+  function setSnapshot(cache: Record<ID, Context>) {
+    if (!isFrozen) {
+      throw new Error('Only forzen mode support [setSnapshot] method');
+    }
+    const needUpdateIds: ID[] = [];
+    Object.entries(cache).forEach(([id, ctx]) => {
+      const oldContext = ctxMap.get(id);
+      ctxMap.set(id, fillCtx(ctx));
+      if (oldContext?.version !== ctx.version) {
+        needUpdateIds.push(id);
+      }
+    });
+    needUpdateIds.forEach((id) => {
+      notify(id);
+    });
+  }
+
   function recall<Param extends any[], Ret>(
     signal: Signal<Param, Ret> | DataSource<any, Param, Ret>,
     newOption: Signal<Param, Ret>['option'],
@@ -113,6 +170,13 @@ export const createStore = (initialValues: Record<ID, Context>) => {
 
   function exec(id: ID): Context {
     const oldContext = ctxMap.get(id);
+    if (isFrozen) {
+      if (!oldContext)
+        throw new Error(
+          'In forzen mode, signal can not run actually, there is no target cache value in snapshot data',
+        );
+      return oldContext;
+    }
     const execution = executionMap.get(id)!;
     const { timeout, args = [] } = optionMap.get(id) || {};
     const type = typeMap.get(id)!;
@@ -138,7 +202,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       type,
     };
     const getter = (other: Signal<any> | Signal<any>['id']) => {
-      if (ctx.isOld) {
+      if (ctx.isOld || !mountFlag) {
         throw new OldVersionError();
       }
       if (typeof other !== 'string') {
@@ -181,7 +245,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
     let allowSetterTriggerUpdate = false;
     let hasSetBeforeReturnCleanup = false;
     const setter = (v: Signal['typeMarker']) => {
-      if (ctx.isOld) return;
+      if (ctx.isOld || !mountFlag) return;
       if (v !== ctx.data.value) {
         ctx.data = {
           ...ctx.data,
@@ -369,7 +433,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
     currentIds = currentIds || allIds;
     let { graphIds, graph } = currentIds.reduce(
       (acc, id) => {
-        if (ctxMap.get(id)!.dependencies.length === 0) return acc;
+        if (ctxMap.get(id)!.dependencies.length !== 0) return acc;
         return {
           graph: {
             ...acc.graph,
@@ -388,8 +452,8 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       const prevLen = graphIds.length;
       const tmp = allIds.reduce(
         (acc, id) => {
-          if (graph[id]) return acc;
-          if (ctxMap.get(id)!.dependencies.every((v) => graph[v])) return acc;
+          if (graph[id]) return acc; // avoid duplicate
+          if (ctxMap.get(id)!.dependencies.some((v) => !graph[v])) return acc;
           return {
             graph: {
               ...acc.graph,
@@ -410,9 +474,9 @@ export const createStore = (initialValues: Record<ID, Context>) => {
       }
     }
 
-    if (needGC)
+    if (needGC) {
       allIds.forEach((removeId) => {
-        if (!graphIds[removeId]) {
+        if (!graph[removeId]) {
           const t = ctxMap.get(removeId)!;
           if (t.cleanup) t.cleanup();
           ctxMap.delete(removeId);
@@ -421,6 +485,7 @@ export const createStore = (initialValues: Record<ID, Context>) => {
           optionMap.delete(removeId);
         }
       });
+    }
     return graphIds;
   }
 };

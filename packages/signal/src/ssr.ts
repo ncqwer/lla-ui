@@ -3,7 +3,6 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import type { SSRCache } from './type';
 import type { StoreType } from './hooks';
-import { isPromisify } from './utils';
 
 export const createSSRSupport = (init: SSRCache = {}) => {
   let cache: SSRCache | null = init;
@@ -44,23 +43,7 @@ export const createSSRSupport = (init: SSRCache = {}) => {
     const ans = Array.from(storeMap.entries()).reduce(
       (acc, [n, store]) => ({
         ...acc,
-        [n]: Array.from(store.__internalData.entries()).reduce(
-          (a, [id, ctx]) => ({
-            ...a,
-            [id]: {
-              ...ctx,
-              raw: isPromisify(ctx.raw) ? 'isPromise' : 'isSimple',
-              data: {
-                ...ctx.data,
-                error:
-                  ctx.data.status === 'rejected'
-                    ? ctx.data.error!.message
-                    : null,
-              },
-            },
-          }),
-          {},
-        ),
+        [n]: store.getSnapshot(),
       }),
       {},
     );
