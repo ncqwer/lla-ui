@@ -104,6 +104,20 @@ export function useSignalState<S extends Signal | DataSource>(
   ] as const;
 }
 
+export function useDispatch(): {
+  (signal: Signal['id'], newOption?: any): void;
+  <Param extends any[], Ret>(
+    signal: Signal<Param, Ret> | DataSource<any, Param, Ret>,
+    newOption?: Signal<Param, Ret>['option'],
+  ): void;
+} {
+  const store = React.useContext(StoreContext)!;
+  return React.useCallback(
+    (signal: any, option: any) => store.recall(signal, option),
+    [store],
+  );
+}
+
 // special case for useState interface with sync state
 export function atom<T>(key: ID, _initialValue: T) {
   let prev = _initialValue;
@@ -119,11 +133,16 @@ export function atom<T>(key: ID, _initialValue: T) {
 
 export function useAtom<T>(
   signal: Signal<Array<T | ((v: any) => T)>, T>,
-  initialState: T | (() => T),
+  initialState?: T | (() => T),
 ) {
-  const [value, recall] = useSignalState(signal, {
-    args: [initialState],
-  });
+  const [value, recall] = useSignalState(
+    signal,
+    initialState !== undefined
+      ? {
+          args: [initialState],
+        }
+      : undefined,
+  );
   if (value.error) throw value.error;
   return [
     value.value as T,

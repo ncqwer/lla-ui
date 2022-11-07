@@ -149,12 +149,24 @@ export const createStore = (
     });
   }
 
+  function recall(signal: Signal['id'], newOption?: any): void;
   function recall<Param extends any[], Ret>(
     signal: Signal<Param, Ret> | DataSource<any, Param, Ret>,
-    newOption: Signal<Param, Ret>['option'],
-  ) {
-    optionMap.set(signal.id, { ...signal?.option, ...newOption });
-    exec(signal.id);
+    newOption?: Signal<Param, Ret>['option'],
+  ): void;
+  function recall(signal: Signal['id'] | Signal | DataSource, newOption?: any) {
+    if (typeof signal === 'object') {
+      optionMap.set(signal.id, { ...signal?.option, ...newOption });
+      exec(signal.id);
+    } else {
+      const oldOption = optionMap.get(signal);
+      if (!oldOption)
+        throw new Error(
+          'recall signal with id only work after signal has executed',
+        );
+      optionMap.set(signal, { ...oldOption, ...newOption });
+      exec(signal);
+    }
   }
 
   function getCtx(signal: Signal<any> | DataSource) {
