@@ -121,10 +121,11 @@ export function useDispatch(): {
 // special case for useState interface with sync state
 export function atom<T>(key: ID, _initialValue: T) {
   let prev = _initialValue;
-  return signal(key, (_, v: React.SetStateAction<T>) => {
+  return signal(key, function (_, v: React.SetStateAction<T>) {
     if (typeof v === 'function') {
       prev = (v as any)(prev);
-    } else {
+    } else if (arguments.length === 2) {
+      // to support setAtom(void 0);
       prev = v;
     }
     return prev as T;
