@@ -11,11 +11,12 @@
     "devadd": "yarn add -D --ignore-workspace-root-check",
     "build": "lerna run build --ignore doc",
     "dev": "cd playground && yarn dev",
-    "publish": "yarn lerna publish",
     "pkgadd": "node script/create.js"
   },
   "license": "MIT",
   "devDependencies": {
+    "@slidev/cli": "^0.40.3",
+    "@slidev/theme-default": "^0.21.2",
     "@testing-library/react": "^13.4.0",
     "@types/jest": "^28.1.8",
     "@types/react": "^18.0.17",
@@ -24,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
     "@vitejs/plugin-react": "^2.0.1",
+    "@zhujianshi/lint": "^1.0.2",
     "autoprefixer": "^10.4.8",
     "dotenv-cli": "^6.0.0",
     "eslint": "^8.23.0",

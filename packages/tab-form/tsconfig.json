@@ -3,9 +3,7 @@
   "include": ["src/**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true
+    "outDir": "dist"
   },
-  "references": [{ "path": "../floating" }]
+  "references": [{ "path": "../utils" }]
 }

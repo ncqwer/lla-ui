@@ -1,0 +1,13 @@
+{
+  "extends":"../../config/tsconfig.base.json",
+  "include": ["src/**/*"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "outDir": "dist",
+  },  
+  "references": [
+    {"path":"../utils"},
+    {"path":"../floating"},
+    {"path":"../workflow-core"}
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@lla-ui/theme",
+  "name": "@lla-ui/tab-form",
   "version": "0.0.8",
   "description": "react ui helper with tailwind",
   "author": "“ncqwer” <“18694039767@163.com”>",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ncqwer/mono-exmaple-ui.git"
+    "url": "git+https://github.com/ncqwer/lla-ui.git"
   },
   "scripts": {
     "build:css": "yarn postcss notailwind.css -o dist/style/notailwind.css",
@@ -29,9 +29,9 @@
     "prepublish": "rm dist/tsconfig.tsbuildinfo"
   },
   "bugs": {
-    "url": "https://github.com/ncqwer/mono-exmaple-ui/issues"
+    "url": "https://github.com/ncqwer/lla-ui/issues"
   },
-  "homepage": "https://github.com/ncqwer/mono-exmaple-ui#readme",
+  "homepage": "https://github.com/ncqwer/lla-ui#readme",
   "source": "src/index.ts",
   "types": "dist/src/index.d.ts",
   "peerDependencies": {
@@ -52,16 +52,8 @@
     }
   },
   "dependencies": {
-    "@lla-ui/floating": "^0.0.8",
-    "@zhujianshi/use-lens": "^0.0.16",
-    "classnames": "^2.3.2",
-    "color": "^4.2.3",
-    "deepmerge-ts": "^4.2.2",
-    "react-color": "^2.19.3"
-  },
-  "devDependencies": {
-    "@types/color": "^3.0.3",
-    "@types/react-color": "^3.0.6"
-  },
-  "gitHead": "890acbc5edc2ff7607f97f7b63be70c7fcb1434d"
+    "@lla-ui/utils": "^0.0.8",
+    "@zhujianshi/lens": "^0.0.9",
+    "use-sync-external-store": "^1.2.0"
+  }
 }

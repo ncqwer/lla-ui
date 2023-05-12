@@ -6,6 +6,9 @@
     { "path": "../packages/theme" },
     { "path": "../packages/utils" },
     { "path": "../packages/floating" },
-    { "path": "../packages/signal" }
+    { "path": "../packages/signal" },
+    { "path": "../packages/workflow-ui" },
+    { "path": "../packages/workflow-core" },
+    { "path": "../packages/tab-form" }
   ]
 }

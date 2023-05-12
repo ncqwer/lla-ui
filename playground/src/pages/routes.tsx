@@ -7,6 +7,8 @@ import TryPage from './try';
 import ModalPage from './modal';
 import ContextPage from './context';
 import SnapshotPage from './snapshot';
+import WorkFlow from './workflow';
+import TabForm from './tab-form';
 
 export default () => {
   return (
@@ -21,6 +23,8 @@ export default () => {
             path="snapshot/*"
             element={<SnapshotPage></SnapshotPage>}
           ></Route>
+          <Route path="workflow/*" element={<WorkFlow></WorkFlow>}></Route>
+          <Route path="tab-form/*" element={<TabForm></TabForm>}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
