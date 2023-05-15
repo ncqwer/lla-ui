@@ -1,6 +1,6 @@
 {
   "name": "@lla-ui/workflow-ui",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "react ui helper with tailwind",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
@@ -52,8 +52,8 @@
     }
   },
   "dependencies": {
-    "@lla-ui/floating": "^0.0.10",
-    "@lla-ui/utils": "^0.0.10",
+    "@lla-ui/floating": "^0.0.11",
+    "@lla-ui/utils": "^0.0.11",
     "@zhujianshi/use-lens": "^0.0.15",
     "d3-hierarchy": "^3.1.2",
     "react-inspector": "^6.0.1",
