@@ -1,6 +1,6 @@
 {
   "name": "@lla-ui/signal",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "react ui helper with tailwind",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@lla-ui/utils": "^0.0.9",
+    "@lla-ui/utils": "^0.0.10",
     "use-sync-external-store": "^1.2.0"
   },
   "devDependencies": {
