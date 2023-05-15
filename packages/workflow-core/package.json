@@ -32,5 +32,6 @@
   },
   "homepage": "https://github.com/ncqwer/lla-ui#readme",
   "source": "src/index.ts",
-  "types": "dist/src/index.d.ts"
+  "types": "dist/src/index.d.ts",
+  "gitHead": "14f96356309f509ff0f3e734a49001297e614f07"
 }

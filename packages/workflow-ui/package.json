@@ -59,5 +59,6 @@
     "react-inspector": "^6.0.1",
     "reactflow": "^11.5.3",
     "uuid": "^9.0.0"
-  }
+  },
+  "gitHead": "14f96356309f509ff0f3e734a49001297e614f07"
 }
