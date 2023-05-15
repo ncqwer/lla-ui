@@ -29,9 +29,9 @@
     "prepublish": "rm dist/tsconfig.tsbuildinfo"
   },
   "bugs": {
-    "url": "https://github.com/ncqwer/mono-exmaple-ui/issues"
+    "url": "https://github.com/ncqwer/lla-ui/issues"
   },
-  "homepage": "https://github.com/ncqwer/mono-exmaple-ui#readme",
+  "homepage": "https://github.com/ncqwer/lla-ui#readme",
   "source": "src/index.ts",
   "types": "dist/src/index.d.ts",
   "peerDependencies": {
