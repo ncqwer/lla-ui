@@ -1,6 +1,6 @@
 {
   "name": "@lla-ui/tab-form",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "react ui helper with tailwind",
   "author": "“ncqwer” <“18694039767@163.com”>",
   "license": "MIT",
@@ -52,7 +52,7 @@
     }
   },
   "dependencies": {
-    "@lla-ui/utils": "^0.0.8",
+    "@lla-ui/utils": "^0.0.9",
     "@zhujianshi/lens": "^0.0.9",
     "use-sync-external-store": "^1.2.0"
   }
