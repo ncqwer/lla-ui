@@ -5,8 +5,7 @@ import { useDebounce } from './useDebounce';
 
 export const useSize = <E extends HTMLElement = any>(timeout = 0) => {
   const ref = React.useRef<E>(null);
-  const lastRef = React.useRef<any>(null);
-  const observerRef = React.useRef<any>(null);
+  const lastRef = React.useRef<E | null>(null);
   const [size, setSizeRaw] =
     React.useState<
       Record<
@@ -30,11 +29,12 @@ export const useSize = <E extends HTMLElement = any>(timeout = 0) => {
     }
   }, timeout);
 
+  const hasObserverRef = React.useRef<boolean>(false);
+
   useIsomorphicEffect(() => {
     if (ref.current) {
-      if (lastRef.current !== ref.current) {
+      if (lastRef.current !== ref.current || !hasObserverRef.current) {
         lastRef.current = ref.current;
-        if (observerRef.current) observerRef.current.disconnect();
         const { clientHeight, clientWidth, offsetHeight, offsetWidth } =
           ref.current as any;
         setSize({
@@ -62,14 +62,14 @@ export const useSize = <E extends HTMLElement = any>(timeout = 0) => {
         });
 
         observer.observe(ref.current);
+        hasObserverRef.current = true;
+        return () => {
+          observer.disconnect();
+          hasObserverRef.current = false;
+        };
       }
     }
   });
 
-  useIsomorphicEffect(() => {
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, []);
   return [size, ref] as const;
 };

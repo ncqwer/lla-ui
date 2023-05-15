@@ -9,6 +9,7 @@ import ContextPage from './context';
 import SnapshotPage from './snapshot';
 import WorkFlow from './workflow';
 import TabForm from './tab-form';
+import Size from './size';
 
 export default () => {
   return (
@@ -25,6 +26,7 @@ export default () => {
           ></Route>
           <Route path="workflow/*" element={<WorkFlow></WorkFlow>}></Route>
           <Route path="tab-form/*" element={<TabForm></TabForm>}></Route>
+          <Route path="size/*" element={<Size></Size>}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
