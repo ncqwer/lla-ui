@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ncqwer/mono-exmaple-ui.git"
+    "url": "git+https://github.com/ncqwer/lla-ui.git"
   },
   "scripts": {
     "build:css": "yarn postcss notailwind.css -o dist/style/notailwind.css",
