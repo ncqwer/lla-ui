@@ -312,7 +312,7 @@ const mergeChildrenMap = (
   // make first element is new or remain
 
   const idx = ans.findIndex((v) => !!v[2]);
-  if (!~idx) ans = [...ans.slice(idx), ...ans.slice(0, idx)];
+  if (~idx) ans = [...ans.slice(idx), ...ans.slice(0, idx)];
 
   // add remove
   while (prev_idx < prevs.length) {

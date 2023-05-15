@@ -18,7 +18,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ncqwer/lla-ui.git"
+    "url": "git+https://github.com/ncqwer/lla-ui.git",
+    "directory": "packages/utils"
   },
   "scripts": {
     "build:type": "tsc --emitDeclarationOnly",
