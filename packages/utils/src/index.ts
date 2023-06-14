@@ -13,3 +13,4 @@ export * from './helper/isBrowser';
 export * from './hooks/useFSM';
 export * from './hooks/useTransitionStatus';
 export * from './hooks/useCollapse';
+export * from './hooks/useSlideTrack';

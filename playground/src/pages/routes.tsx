@@ -10,6 +10,7 @@ import SnapshotPage from './snapshot';
 import WorkFlow from './workflow';
 import TabForm from './tab-form';
 import Size from './size';
+import Slick from './slick';
 
 export default () => {
   return (
@@ -20,6 +21,7 @@ export default () => {
           <Route path="try/*" element={<TryPage></TryPage>}></Route>
           <Route path="modal/*" element={<ModalPage></ModalPage>}></Route>
           <Route path="context/*" element={<ContextPage></ContextPage>}></Route>
+          <Route path="slick/*" element={<Slick></Slick>}></Route>
           <Route
             path="snapshot/*"
             element={<SnapshotPage></SnapshotPage>}
