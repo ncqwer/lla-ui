@@ -15,6 +15,7 @@
     "@lla-ui/signal": "^0.0.13",
     "@lla-ui/tab-form": "^0.0.13",
     "@lla-ui/theme": "^0.0.13",
+    "@lla-ui/tree": "^0.0.13",
     "@lla-ui/utils": "^0.0.13",
     "@lla-ui/workflow-core": "^0.0.13",
     "@lla-ui/workflow-ui": "^0.0.13",

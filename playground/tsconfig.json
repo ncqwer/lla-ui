@@ -9,6 +9,7 @@
     { "path": "../packages/signal" },
     { "path": "../packages/workflow-ui" },
     { "path": "../packages/workflow-core" },
-    { "path": "../packages/tab-form" }
+    { "path": "../packages/tab-form" },
+    { "path": "../packages/tree" }
   ]
 }

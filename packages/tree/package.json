@@ -1,0 +1,38 @@
+{
+  "name": "@lla-ui/tree",
+  "version": "0.0.13",
+  "description": "react ui helper with tailwind",
+  "author": "ncqwer <1732031236@qq.com>",
+  "license": "MIT",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
+  "directories": { "lib": "dist", "test": "__tests__" },
+  "files": ["dist", "style"],
+  "publishConfig": { "registry": "https://registry.yarnpkg.com" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ncqwer/lla-ui.git"
+  },
+  "scripts": {
+    "build:css": "yarn postcss notailwind.css -o dist/style/notailwind.css",
+    "build:type": "tsc --emitDeclarationOnly",
+    "build:ts": "vite build",
+    "build": "yarn build:ts && yarn build:type && yarn build:css",
+    "prepublish": "rm dist/tsconfig.tsbuildinfo"
+  },
+  "bugs": { "url": "https://github.com/ncqwer/lla-ui/issues" },
+  "homepage": "https://github.com/ncqwer/lla-ui#readme",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "peerDependencies": {
+    "@types/react": "^16.8 || ^17.0 || ^18.0",
+    "@types/react-dom": "^16.8 || ^17.0 || ^18.0",
+    "react": "^16.8 || ^17.0 || ^18.0",
+    "react-dom": "^16.8 || ^17.0 || ^18.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": { "optional": true },
+    "@types/react-dom": { "optional": true },
+    "react-dom": { "optional": true }
+  }
+}
